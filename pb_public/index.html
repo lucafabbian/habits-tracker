@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habits Dashboard</title>
+    <script src="libs/tailwind.js"></script>
+    <link rel="stylesheet" href="zmdi/css/material-design-iconic-font.min.css">
+    <script src="libs/pocketbase.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <script src="libs/notyf.min.js"></script>
+    <script src="libs/chart.js"></script>
+    <script src="index.js"></script>
+    <script src="libs/alpinejs.js" defer></script>
+    <style> body { scrollbar-gutter: stable;} </style>
+</head>
+<body class="bg-gray-100 overflow-y-scroll" x-data>
+    <!-- Fixed Aggregate Bar -->
+    <div class="fixed bottom-0 top-0 w-[190px] left-0 bg-black/80 backdrop-blur-sm text-white z-50 pt-10 px-6">
+        <h1 class="text-2xl font-bold uppercase tracking-wide text-white bg-clip-text pb-6 text-center">
+            Habits Tracker
+        </h1>
+        <template x-for="tab in tabs" :key="tab[0]">
+            <a href="#"
+               x-text="tab[0]"
+               @click.prevent="window.location.hash = tab[0]"
+            class="block mb-2 text-center px-4 py-2 rounded-lg  text-white font-medium bg-black/10 hover:bg-black/40 hover:shadow-lg transition-colors">
+            </a>
+        </template>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-[1200px] mx-auto px-4 pl-[215px]">
+
+        <!-- Goals Tab -->
+        <div x-show="data.tab == 'goals'" x-transition.duration.500ms>
+            <div class="mt-6 space-x-5 text-gray-600">
+                <span x-text="`Monthly: ${signed(Object.values(data.goals).map(goal => goal.monthlyTotal).reduce((a, b) => a + b, 0))}`"></span>
+                <span x-text="`Daily: ${signed(Object.values(data.goals).map(goal => goal.dailyTotal).reduce((a, b) => a + b, 0))}`"></span>
+            </div>
+            <div class="chart-container" style="position: relative; height:200px; width:100%">
+                <canvas id="chart"></canvas>
+            </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 py-8">
+                <template x-for="goal in data.goals">
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex mb-4">
+                            <div :class="`w-12 h-12 shrink-0 mr-3 ${goal.icon.split('|')[0]}  rounded-full flex items-center justify-center`">
+                                <i :class="`text-2xl zmdi ${goal.icon.split('|')[1]} inline-flex items-center justify-center`"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold -mt-px" x-text="goal.name + signed(goal.dailyTotal)"></h3>
+                                <p class="text-gray-500 text-sm" x-text="`Monthly: ${signed(goal.monthlyTotal)}`"></p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <template x-for="button in goal.buttons.replaceAll('\r', '').split('\n').map(b => b.split('|'))">
+                                <button @click="onPlusClick(goal, Number(button[0]))" :class="`block ${button[2]} px-2 pb-1 rounded-full flex items-center justify-center`"
+                                x-text="button[1]">                                
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed top-4 right-4">
+        <button x-transition.delay.200ms x-show="data.tab === 'goals'"
+        @click="onEditClick()" class="text-white w-10 h-10 text-center rounded-full bg-[rgb(34_34_34)] zmdi zmdi-edit cursor-pointer hover:bg-black" ></button>    
+        <button x-transition.delay.200ms x-show="data.tab === 'goals' && data.actions.length > 0"
+        @click="onUndoClick()" class="text-white p-4 rounded-full bg-[rgb(34_34_34)] zmdi zmdi-undo cursor-pointer hover:bg-black" ></button>
+    </div>
+
+
+    <template x-if="data.dialogs.length > 0">
+        <div class="fixed inset-0 z-50">
+            <!-- Mask -->
+            <div class="absolute inset-0 bg-black opacity-50" @click="data.dialogs.pop()"></div>
+            <!-- Dialog -->
+            <div class="relative flex items-center justify-center min-h-screen">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4" x-text="data.dialogs.at(-1).title"></h3>
+                    <p class="mb-4" x-text="data.dialogs.at(-1).title"></p>
+                    <button @click="data.dialogs.pop()" class="px-4 py-2 bg-blue-500 text-white rounded">Close</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</body>
+</html>
