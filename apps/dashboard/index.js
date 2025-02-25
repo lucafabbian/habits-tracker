@@ -12,6 +12,7 @@ window.tabs = [
     ['goals'],
     ['food'],
     ['rules'],
+    ['book'],
 ]
 const updateTabFromHash = () => {
     const newTab = window.location.hash.substring(1);
@@ -26,8 +27,7 @@ window.signed = (n) => n < 0 ? n : '+' + n
 
 
 // QUERY AND STATE INTERACTION
-window.pb = new PocketBase(window.location.origin)
-pb.autoCancellation(false)
+
 window.query = async (query, obj = undefined, type = undefined) => {
     type = obj === undefined ? "execute" : "all"
     const jsonBody = { query, obj, type }
@@ -78,29 +78,12 @@ const chartData = async() => {
 
 }
 
+
 // MAIN
-async function main(){
-    // SETUP TOASTS
-    const notyf = new Notyf( {})
-    window.toast = {
-        log: (...args) => notyf.success(args.join(' ')),
-        error: (...args) => notyf.error(args.join(' ')),
-        info: (...args) => notyf.open({background: '#337ab7', icon: {
-            className: 'zmdi zmdi-info-outline',
-            tagName: 'i', 
-            color: 'white'
-        }, message: args.join(' ')}),
-        undo: (...args) => notyf.open({background: '#337ab7', icon: {
-            className: 'zmdi zmdi-undo',
-            tagName: 'i',
-            color: 'white'
-        }, message: args.join(' ')}),
-    }
-    
+const main = async() => {
+
     // AUTH AND RETRIEVE STATE
-    if(!localStorage['pass']) localStorage['pass'] = prompt('Enter password')
-    const authData = await pb.collection("_superusers").authWithPassword('luca.fabbian.1999@gmail.com', localStorage['pass']);
-    console.log("Auth data:", authData)
+    await utils.auth()
     updateGoals();
     chartData().then(cd => {
         const ctx = document.getElementById('chart').getContext('2d');

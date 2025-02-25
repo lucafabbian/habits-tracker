@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#f3f4f6">
+    <link rel="icon" type="image/png" href="/icon.png">
+    <title>Book reader</title>
+    <script src="libs/tailwind.js"></script>
+    <link rel="stylesheet" href="libs/zmdi/css/material-design-iconic-font.min.css">
+    <script src="libs/pocketbase.umd.js"></script>
+    <link rel="stylesheet" href="libs/notyf.min.css">
+    <script src="libs/notyf.min.js"></script>
+    <script src="libs/jszip.min.js"></script>
+    <script src="libs/epub.min.js"></script>
+    <script src="libs/utils.js"></script>
+    <script src="index.js"></script>
+    <script src="libs/alpinejs.js" defer></script>
+    <style> [x-cloak] { display: none !important; } 
+        .epub-container {overflow-x: hidden !important;}
+    </style>
+</head>
+<body class="bg-gray-100" x-data>
+    <div x-show="store.currentBook == null" class="pt-[30vh]" x-cloak>
+        <div class="max-w-[350px] mx-auto text-center pb-8">
+            Load a book using the button below, then touch on  left <i class="zmdi zmdi-chevron-left text-xl mx-2"></i>
+            and right <i class="zmdi zmdi-chevron-right text-xl mx-2"></i> to change page
+    
+        </div>
+        <button @click="data.openList = true" class="mx-auto block w-auto px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded">Choose book</button>
+    </div>
+    <div x-show="store.currentBook != null"  x-cloak>
+        <div id="bookarea" class="pb-[25px]"></div> 
+        <div class="fixed left-0 right-0 bottom-0 h-[27px] pt-[9px] text-gray-400 px-[34px] text-xs bg-black select-none">
+            <div class="max-w-[445px] mx-auto">
+                <p class="float-left" x-text="perc()"></p>
+                <button @click="data.openList = true" class="float-right" x-text="store?.currentBook?.title ?? ''"></button>    
+            </div>
+        </div>
+        <button @click="rendition.prev()" class="fixed bottom-0 top-0 left-0 w-[40px] select-none pr-1"></button>
+        <button @click="rendition.next()" class="fixed bottom-0 top-0 right-0 w-[40px] select-none pl-1"></button>
+    </div>
+
+
+    <template x-if="data.openList">
+        <div class="fixed inset-0 z-50 flex items-center">
+            <!-- Mask -->
+            <div class="absolute inset-0 bg-black opacity-50" @click="data.openList = false"></div>
+            <!-- Dialog -->
+            <div class="bg-white z-50 p-8 mb-16 rounded-lg shadow-lg w-[350px] mx-auto">
+                <h3 class="text-2xl font-bold mb-4">Available books</h3>
+                <div class="h-[40vh] overflow-y-auto border-solid border-gray-400 border-[1px] mb-5">
+                    <template x-for="book in store.bookList" :key="book.id">
+                        <button x-text="book.title" class="text-left block w-full px-[5px] py-2 even:bg-gray-100 odd:bg-gray-200 hover:bg-gray-300"
+                        @click="store.currentBook = book; location.reload()"></button>
+                    </template>
+                </div>
+                <div class="flex space-x-2 text-center">
+                    <button @click="data.openList = false" class="flex-1 text-sm px-3 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded">
+                        <i class="zmdi zmdi-close text-base"></i> Go back
+                    </button>
+                    <a :href="`${utils.serverURL}/_/#/collections?collection=pbc_2170393721`" class="flex-1 text-sm px-3 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded">
+                        <i class="zmdi zmdi-upload text-base"></i> Upload
+                    </a>
+                    <button @click="store.currentBook = null; location.reload()" class="flex-1 text-sm px-3 py-2 bg-red-500 hover:bg-red-700 text-white rounded">
+                        <i class="zmdi zmdi-refresh text-base"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+</body>
+</html>

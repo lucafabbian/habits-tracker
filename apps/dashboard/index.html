@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habits Dashboard</title>
     <script src="libs/tailwind.js"></script>
-    <link rel="stylesheet" href="zmdi/css/material-design-iconic-font.min.css">
+    <link rel="stylesheet" href="libs/zmdi/css/material-design-iconic-font.min.css">
     <script src="libs/pocketbase.umd.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link rel="stylesheet" href="libs/notyf.min.css">
     <script src="libs/notyf.min.js"></script>
     <script src="libs/chart.js"></script>
+    <script src="libs/utils.js"></script>
     <script src="index.js"></script>
     <script src="libs/alpinejs.js" defer></script>
     <style> body { scrollbar-gutter: stable;} </style>
@@ -64,6 +65,11 @@
                     </div>
                 </template>
             </div>
+        </div>
+
+        <!-- Book Tab -->
+        <div x-show="data.tab == 'book'" id="bookarea" x-transition.duration.500ms>
+        
         </div>
     </div>
 

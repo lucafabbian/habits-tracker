@@ -1,0 +1,27 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+mkdir -p "$(pwd)/../.dtach"
+
+declare -A apps
+apps['bookreader']="8091"
+apps['dashboard']="8092"
+
+
+# start apps
+if [ "$1" == "start" ]; then
+    shift
+    for fullapp in "$@"; do
+        app="${fullapp#apps/}"
+        echo $app
+        if [ -n "${apps[$app]}" ]; then
+            dtach -c "$(pwd)/../.dtach/${app}.sock" -e "@" busybox httpd -f -h "$fullapp" -p 0.0.0.0:"${apps[$app]}"
+            echo "${apps[$app]}"
+        else
+            echo "No port defined for app: $app"
+        fi
+    done
+fi
+
+
+
+#dtach -A "$SOCK" -e "@" ./pocketbase serve --http 0.0.0.0:8090

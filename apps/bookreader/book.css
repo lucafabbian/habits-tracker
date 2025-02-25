@@ -1,0 +1,18 @@
+
+body {
+    overflow-x: hidden;
+}
+
+body > * {
+    max-width: 450px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+body > :first-child {
+    padding-top: 25px !important;
+}
+
+body > :last-child {
+    padding-bottom: 125px !important;
+}
