@@ -24,6 +24,7 @@ document.addEventListener('alpine:init', () => {
 })
 
 
+// get text for the bottom-left corner, representing book progess
 window.perc = () => {
     if(
         !data.isBookReady ||
@@ -35,7 +36,6 @@ window.perc = () => {
     const total = store.booksTotal[store.currentBook.title]
     const loc = book.locations.locationFromCfi(store.booksProgress[store.currentBook.title])
     const p = book.locations.percentageFromCfi(store.booksProgress[store.currentBook.title])
-    console.log(loc)
 
     return `${loc}/${total} - ${(p * 100).toFixed(2)}%`
 }
@@ -56,9 +56,7 @@ window.main = async() => {
         // cache paginations
         book.locations._locations = store.booksLocation[store.currentBook.title] || []
         book.locations.total = store.booksTotal[store.currentBook.title] || 0
-        console.log(book.locations._locations)
         if(book.locations._locations.length == 0) {
-            console.log("generating")
             window.book.locations.generate(2500).then( () => {
                 store.booksLocation[store.currentBook.title] = book.locations._locations
                 store.booksTotal[store.currentBook.title] = book.locations.total
@@ -69,10 +67,16 @@ window.main = async() => {
         rendition.on("relocated", (location) => {
             const {cfi} = location.start
             store.booksProgress[store.currentBook.title] = cfi
-            //data.percentage = window.book.locations.percentageFromCfi(cfi);
-            console.log(cfi, window.book.locations.percentageFromCfi(cfi))
-
         })
+
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'ArrowLeft') {
+                rendition.prev();
+            } else if (event.key === 'ArrowRight') {
+                rendition.next();
+            }
+        });
+
         data.isBookReady = true
     };
 }
